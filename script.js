@@ -29,10 +29,23 @@ const hueSpeed = 360 / (60 * 6);
 const warmTint = "rgba(255, 140, 80, 1)";
 
 
-// ⭐ FULLSCREEN CANVAS RESIZE FUNCTION
+// ⭐ FULLSCREEN CANVAS RESIZE WITH CAMERA ASPECT RATIO
 function resizeAll() {
-    const w = window.innerWidth;
-    const h = window.innerHeight - 100; // leave room for buttons
+    const screenW = window.innerWidth;
+    const screenH = window.innerHeight - 100;
+
+    const videoAspect = video.videoWidth / video.videoHeight;
+    const screenAspect = screenW / screenH;
+
+    let w, h;
+
+    if (screenAspect > videoAspect) {
+        h = screenH;
+        w = h * videoAspect;
+    } else {
+        w = screenW;
+        h = w / videoAspect;
+    }
 
     canvas.width = w;
     canvas.height = h;
@@ -64,6 +77,8 @@ navigator.mediaDevices.getUserMedia({
 
 // ⭐ BUTTONS
 document.getElementById("beginButton").addEventListener("click", () => {
+    resizeAll();
+
     if (fadingIn || isFrozen) return;
 
     fadeProgress = 0;
@@ -81,7 +96,7 @@ document.getElementById("beginButton").addEventListener("click", () => {
                 isFrozen = true;
             }, 5000);
         }
-    }, 100);
+    }, 50);
 });
 
 document.getElementById("resetButton").addEventListener("click", () => {
@@ -93,6 +108,8 @@ document.getElementById("resetButton").addEventListener("click", () => {
     colorCtx.clearRect(0, 0, colorCanvas.width, colorCanvas.height);
 
     lastFrame = null;
+
+    resizeAll();
 });
 
 
@@ -100,17 +117,17 @@ document.getElementById("resetButton").addEventListener("click", () => {
 function draw() {
     if (!isFrozen) {
 
-        // STEP 1 — Draw raw camera
+        // STEP 1 — Draw raw camera scaled to canvas
         ctx.globalCompositeOperation = "source-over";
         ctx.globalAlpha = 1;
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // STEP 2 — Capture current frame
+        // STEP 2 — Capture current frame at canvas resolution
         const buffer = document.createElement("canvas");
         buffer.width = canvas.width;
         buffer.height = canvas.height;
         const bctx = buffer.getContext("2d");
-        bctx.drawImage(video, 0, 0);
+        bctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const currentFrame = bctx.getImageData(0, 0, canvas.width, canvas.height);
 
         if (lastFrame && fadeProgress > 0) {
@@ -118,7 +135,7 @@ function draw() {
             const curr = currentFrame.data;
             const last = lastFrame.data;
 
-            // Movement mask canvas
+            // Movement mask canvas at canvas resolution
             const maskCanvas = document.createElement("canvas");
             maskCanvas.width = canvas.width;
             maskCanvas.height = canvas.height;
@@ -210,4 +227,3 @@ function draw() {
 
     requestAnimationFrame(draw);
 }
-
