@@ -1,10 +1,10 @@
 ﻿const video = document.getElementById("camera");
 
-// RAW canvas (visible)
+// MAIN metaphysical canvas (visible)
 const canvas = document.getElementById("metaphysicalCanvas");
 const ctx = canvas.getContext("2d");
 
-// TRAIL canvas (soft ghost trails)
+// TRAIL canvas (ghost trails)
 const trailCanvas = document.createElement("canvas");
 const trailCtx = trailCanvas.getContext("2d");
 
@@ -13,47 +13,56 @@ const colorCanvas = document.createElement("canvas");
 const colorCtx = colorCanvas.getContext("2d");
 
 let lastFrame = null;
-
 let isFrozen = false;
 let fadeProgress = 0;
 let fadingIn = false;
 
-// Movement thresholds (Option B: medium sensitivity)
-const lowThreshold = 20;   // ignore breathing + noise
-const highThreshold = 45;  // strong movement → colour ribbons
+// Movement thresholds
+const lowThreshold = 20;
+const highThreshold = 45;
 
-// Hue cycle speed: full rotation every 6 seconds
+// Hue cycle speed
 let hue = 0;
-const hueSpeed = 360 / (60 * 6); // 360 degrees / (60fps * 6 seconds)
+const hueSpeed = 360 / (60 * 6);
 
-// Warm tint (Option 2)
+// Warm tint
 const warmTint = "rgba(255, 140, 80, 1)";
 
 
+// ⭐ FULLSCREEN CANVAS RESIZE FUNCTION
+function resizeAll() {
+    const w = window.innerWidth;
+    const h = window.innerHeight - 100; // leave room for buttons
+
+    canvas.width = w;
+    canvas.height = h;
+
+    trailCanvas.width = w;
+    trailCanvas.height = h;
+
+    colorCanvas.width = w;
+    colorCanvas.height = h;
+}
+
+window.addEventListener("resize", resizeAll);
+
+
+// ⭐ CAMERA SETUP
 navigator.mediaDevices.getUserMedia({
-    video: {
-        facingMode: { ideal: "environment" }
-    }
+    video: { facingMode: { ideal: "environment" } }
 })
     .then(stream => {
         video.srcObject = stream;
 
         video.addEventListener("loadedmetadata", () => {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-
-            trailCanvas.width = video.videoWidth;
-            trailCanvas.height = video.videoHeight;
-
-            colorCanvas.width = video.videoWidth;
-            colorCanvas.height = video.videoHeight;
-
+            resizeAll();
             draw();
         });
     })
     .catch(err => console.error("Camera error:", err));
 
 
+// ⭐ BUTTONS
 document.getElementById("beginButton").addEventListener("click", () => {
     if (fadingIn || isFrozen) return;
 
@@ -86,6 +95,8 @@ document.getElementById("resetButton").addEventListener("click", () => {
     lastFrame = null;
 });
 
+
+// ⭐ MAIN DRAW LOOP
 function draw() {
     if (!isFrozen) {
 
@@ -131,7 +142,8 @@ function draw() {
             }
 
             maskCtx.putImageData(maskData, 0, 0);
-            // DILATE THE MOVEMENT MASK (thicken trails)
+
+            // DILATE MOVEMENT MASK
             const dilated = maskCtx.getImageData(0, 0, canvas.width, canvas.height);
             const d = dilated.data;
 
@@ -139,18 +151,15 @@ function draw() {
                 for (let x = 1; x < canvas.width - 1; x++) {
                     const i = (y * canvas.width + x) * 4;
 
-                    // If this pixel is movement
                     if (d[i + 3] > 0) {
-                        // Spread movement to neighbors
                         const neighbors = [
-                            i - 4,               // left
-                            i + 4,               // right
-                            i - canvas.width * 4,  // up
-                            i + canvas.width * 4   // down
+                            i - 4,
+                            i + 4,
+                            i - canvas.width * 4,
+                            i + canvas.width * 4
                         ];
-
                         for (const n of neighbors) {
-                            d[n + 3] = 255; // make neighbor opaque
+                            d[n + 3] = 255;
                         }
                     }
                 }
@@ -159,30 +168,25 @@ function draw() {
             maskCtx.putImageData(dilated, 0, 0);
 
 
-            // STEP 4 — Soft ghost trails (medium movement)
+            // STEP 4 — Soft ghost trails
             trailCtx.globalCompositeOperation = "source-over";
-            trailCtx.globalAlpha = 0.03 * fadeProgress; // slightly reduced
+            trailCtx.globalAlpha = 0.03 * fadeProgress;
             trailCtx.drawImage(maskCanvas, 0, 0);
 
-            // STEP 5 — Colour ribbons (strong movement)
+            // STEP 5 — Colour ribbons
             hue += hueSpeed;
             if (hue >= 360) hue -= 360;
 
-            // Tint mask with warm colour
             colorCtx.globalCompositeOperation = "source-over";
-            colorCtx.globalAlpha = 0.10 * fadeProgress; // slightly increased
+            colorCtx.globalAlpha = 0.10 * fadeProgress;
 
             colorCtx.fillStyle = warmTint;
             colorCtx.fillRect(0, 0, colorCanvas.width, colorCanvas.height);
 
-            // Apply movement mask
             colorCtx.globalCompositeOperation = "overlay";
             colorCtx.globalAlpha = 0.8;
             colorCtx.drawImage(maskCanvas, 0, 0);
 
-           
-
-            // Apply hue rotation
             colorCtx.globalCompositeOperation = "source-over";
             colorCtx.filter = `hue-rotate(${hue}deg)`;
             colorCtx.drawImage(colorCanvas, 0, 0);
@@ -194,7 +198,7 @@ function draw() {
         ctx.globalAlpha = 1;
         ctx.drawImage(trailCanvas, 0, 0);
 
-        // STEP 7 — Blend colour ribbons (gentle but visible)
+        // STEP 7 — Blend colour ribbons
         ctx.globalCompositeOperation = "lighter";
         ctx.globalAlpha = 1;
         ctx.drawImage(colorCanvas, 0, 0);
@@ -206,3 +210,4 @@ function draw() {
 
     requestAnimationFrame(draw);
 }
+
