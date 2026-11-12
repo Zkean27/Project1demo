@@ -1,0 +1,149 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: black;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#camera-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+
+#camera-view {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: black;
+}
+
+/* CONTROLS */
+
+#controls-panel {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 9999;
+}
+
+#controls-toggle {
+    width: 220px;
+    height: 50px;
+    border: none;
+    border-radius: 10px;
+    background: white;
+    color: black;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#controls-content {
+    display: none;
+    width: 220px;
+    margin-top: 10px;
+    padding: 12px;
+    background: rgba(0,0,0,.9);
+    border-radius: 10px;
+}
+
+    #controls-content label {
+        display: flex;
+        flex-direction: column;
+        color: white;
+        margin-bottom: 12px;
+        font-size: 12px;
+    }
+
+    #controls-content input {
+        width: 100%;
+    }
+
+/* ZOOM */
+
+#zoom-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 9999;
+}
+
+    #zoom-controls button {
+        width: 55px;
+        height: 55px;
+        border: none;
+        border-radius: 10px;
+        background: white;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+/* COUNTDOWN */
+
+#countdown {
+    position: absolute;
+    left: 50%;
+    bottom: 140px;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 5rem;
+    font-weight: bold;
+    text-shadow: 0 0 15px rgba(255,255,255,.5);
+    z-index: 9999;
+}
+
+/* MAIN BUTTONS */
+
+#button-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 25px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    z-index: 9999;
+}
+
+    #button-bar button {
+        width: 150px;
+        height: 60px;
+        border: none;
+        border-radius: 10px;
+        background: white;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+#capture-btn:disabled {
+    opacity: .5;
+}
+#capture-canvas {
+    display: none;
+}
+#display-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+    z-index: 1;
+}
+
+#capture-canvas {
+    display: none;
+}

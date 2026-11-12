@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <title>Victorian Spirit Camera</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div id="camera-container">
+
+        <!-- Live Camera -->
+        <video id="camera-view"
+               autoplay
+               playsinline
+               muted></video>
+
+        <!-- Display Canvas -->
+        <canvas id="display-canvas"></canvas>
+
+        <!-- Hidden Capture Canvas -->
+        <canvas id="capture-canvas"></canvas>
+
+        <!-- Controls -->
+        <div id="controls-panel">
+
+            <button id="controls-toggle">
+                CONTROLS
+            </button>
+
+            <div id="controls-content">
+
+                <label>
+                    Motion Memory
+                    <input type="range" min="1" max="100" value="50">
+                </label>
+
+                <label>
+                    Ghost Visibility
+                    <input type="range" min="1" max="100" value="50">
+                </label>
+
+                <label>
+                    Ghost Blur
+                    <input type="range" min="0" max="50" value="10">
+                </label>
+
+                <label>
+                    Contrast
+                    <input type="range" min="0" max="200" value="100">
+                </label>
+
+                <label>
+                    Brightness
+                    <input type="range" min="0" max="200" value="100">
+                </label>
+
+                <label>
+                    Film Grain
+                    <input type="range" min="0" max="100" value="20">
+                </label>
+
+            </div>
+
+        </div>
+
+        <!-- Zoom -->
+
+        <div id="zoom-controls">
+            <button id="zoom-in">+</button>
+            <button id="zoom-out">−</button>
+        </div>
+
+        <!-- Countdown -->
+
+        <div id="countdown">10</div>
+
+        <!-- Buttons -->
+
+        <div id="button-bar">
+
+            <button id="capture-btn">
+                CAPTURE
+            </button>
+
+            <button id="reset-btn">
+                RESET
+            </button>
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
